@@ -1,8 +1,8 @@
 import { NextResponse } from 'next/server'
 
 export async function GET(request, { params }) {
-  const fileId = params.id 
-  const lockerId = fileId.replace('.js', '')
+  const { id } = await params
+  const lockerId = id.replace('.js', '')
 
   const jsCode = `
 const styles = \`
@@ -61,7 +61,7 @@ function tampilkanLocker() {
             }
         });
 }
-  `;
+  `
 
   return new NextResponse(jsCode, {
     headers: {
