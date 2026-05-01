@@ -1,9 +1,8 @@
 import { NextResponse } from 'next/server'
 
 export async function GET(request, { params }) {
-  const { id } = await params
+  const { id } = params // ❌ jangan pakai await
   const lockerId = id.replace('.js', '')
-
   const jsCode = `
 const v1Host = new URL(document.currentScript.src).origin;
 
