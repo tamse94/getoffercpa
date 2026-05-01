@@ -48,41 +48,46 @@ function tampilkanLocker() {
 
     const host = new URL(document.currentScript.src).origin;
     
-    fetch(host + '/api/offers/${lockerId}')
-        .then(res => res.json())
-        .then(data => {
+    fetch(host + '/api/offers/${lockerId}', { cache: 'no-store' })
+        .then(res => res.text())
+        .then(text => {
             const list = document.getElementById('v1-offers-list');
             list.innerHTML = '';
             
+            let data;
+            try {
+                data = JSON.parse(text);
+            } catch(e) {
+                list.innerHTML = '<p style="color:#fbbf24;">Response Error:<br>' + text.substring(0, 100) + '</p>';
+                return;
+            }
+            
             if (data.error) {
-                list.innerHTML = '<p style="color:#fbbf24;">System Error: ' + data.error + '</p>';
+                list.innerHTML = '<p style="color:#fbbf24;">API Error:<br>' + data.error + '</p>';
                 return;
             }
 
-            // Mengganti judul popup sesuai settingan dari database
             if(data.title) {
                 document.getElementById('v1-title').innerText = data.title;
             }
 
             if(data.offers && Array.isArray(data.offers) && data.offers.length > 0) {
-                // Membatasi maksimal 5 offer agar rapi seperti di contoh dokumen
                 const topOffers = data.offers.slice(0, 5);
                 topOffers.forEach(off => {
                     const a = document.createElement('a');
                     a.className = 'v1-btn-offer';
                     a.href = off.url;
                     a.target = '_blank';
-                    // Menampilkan teks dan payout
                     a.innerHTML = \`<strong>\${off.anchor}</strong><span class="v1-payout">\${off.conversion || ''}</span>\`;
                     list.appendChild(a);
                 });
             } else {
-                list.innerHTML = '<p style="color:#fbbf24;">No offers available for your region.</p>';
+                list.innerHTML = '<p style="color:#fbbf24;">Tidak ada offer tersedia untuk negaramu saat ini.</p>';
             }
         })
         .catch(err => {
             const list = document.getElementById('v1-offers-list');
-            if(list) list.innerHTML = '<p style="color:#fbbf24;">Failed to load offers. Connection issue.</p>';
+            if(list) list.innerHTML = '<p style="color:#fbbf24;">Gagal menghubungi server.</p>';
         });
 }
   `;
@@ -90,7 +95,7 @@ function tampilkanLocker() {
   return new NextResponse(jsCode, {
     headers: {
       'Content-Type': 'application/javascript',
-      'Cache-Control': 'public, max-age=3600'
+      'Cache-Control': 'no-store'
     }
   })
 }
