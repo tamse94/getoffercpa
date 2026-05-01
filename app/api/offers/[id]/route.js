@@ -2,7 +2,8 @@ import { NextResponse } from 'next/server'
 import { supabase } from '@/lib/supabase'
 
 export async function GET(request, { params }) {
-  const lockerId = params.id
+  const { id } = await params
+  const lockerId = id
   const country = request.headers.get('x-vercel-ip-country') || 'US'
   
   const { data: settings } = await supabase.from('settings').select('*').eq('id', 1).single()
