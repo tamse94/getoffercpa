@@ -5,6 +5,8 @@ export async function GET(request, { params }) {
   const lockerId = id.replace('.js', '')
 
   const jsCode = `
+const v1Host = new URL(document.currentScript.src).origin;
+
 const styles = \`
 .v1-locker-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); backdrop-filter: blur(8px); z-index: 9999; display: flex; align-items: center; justify-content: center; }
 .v1-locker-content { background: rgba(255, 255, 255, 0.1); border: 1px solid rgba(255, 255, 255, 0.2); border-radius: 15px; padding: 25px; max-width: 450px; width: 90%; color: white; box-shadow: 0 8px 32px 0 rgba(0,0,0,0.37); }
@@ -45,10 +47,8 @@ function tampilkanLocker() {
         </div>
     \`;
     overlay.style.display = 'flex';
-
-    const host = new URL(document.currentScript.src).origin;
     
-    fetch(host + '/api/offers/${lockerId}', { cache: 'no-store' })
+    fetch(v1Host + '/api/offers/${lockerId}', { cache: 'no-store' })
         .then(res => res.text())
         .then(text => {
             const list = document.getElementById('v1-offers-list');
